@@ -1,4 +1,4 @@
-`include "top.sv"
+`include "src/top.sv"
 `default_nettype none
 
 module top_tb;
