@@ -39,10 +39,25 @@ always @(posedge CLK) begin
         end
     end
 
-    // Make every pixel red
-    LCD_R <= 5'b11111;
-    LCD_G <= 6'b000000;
-    LCD_B <= 5'b00000;
+    // Set the first third of the display to red
+    if (cur_col < COLUMNS / 3) begin
+        LCD_R <= 5'b11111;
+        LCD_G <= 6'b000000;
+        LCD_B <= 5'b00000;
+    end
+    // Set the second third of the display to green
+    else if (cur_col < (COLUMNS / 3) * 2) begin
+        LCD_R <= 5'b00000;
+        LCD_G <= 6'b111111;
+        LCD_B <= 5'b00000;
+    end
+    // Set the last third of the display to blue
+    else begin
+        LCD_R <= 5'b00000;
+        LCD_G <= 6'b000000;
+        LCD_B <= 5'b11111;
+    end
+
 end
 
 assign LCD_DEN = (cur_row < ROWS) && (cur_col < COLUMNS);
