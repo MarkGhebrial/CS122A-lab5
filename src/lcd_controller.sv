@@ -4,8 +4,10 @@ module lcd_controller
 (
     input wire CLK, // FPGA's clock
 
-    // input [15:0] pixel,
-    // output [7:0] pixel_address, 
+    // The data that's read from memory
+    input [15:0] pixel,
+    // The address to read from memory
+    output [7:0] pixel_address, 
 
 	output wire LCD_CLK, // LCD clock. 
 	output wire LCD_DEN,
@@ -23,16 +25,6 @@ parameter COL_BUFFER = 45;
 parameter ROWS = 272;
 // The size of the vertical buffer
 parameter ROW_BUFFER = 13;
-
-
-logic[7:0] buf_addr = 0;
-wire[15:0] buf_data;
-dp_buffer a 
-(
-    .clk(CLK),
-    .raddr(buf_addr),
-    .rdata(buf_data)
-);
 
 // Vertical position. Max value is COLUMNS + COL_BUFFER - 1. Min value is 0.
 logic[8:0] cur_row = 0;
@@ -56,31 +48,11 @@ always @(posedge CLK) begin
 
     // Sprite column = cur_col % 16
     // Sprite row = cur_row % 16
-    buf_addr <= (cur_col % 16) + 16*(cur_row %16);
+    pixel_address <= (cur_col % 16) + 16*(cur_row %16);
 
-    LCD_R <= (buf_data >> 11);
-    LCD_G <= (buf_data >> 5) & 6'b1111111;
-    LCD_B <= (buf_data) & 5'b11111;
-
-    // // Set the first third of the display to red
-    // if (cur_col < COLUMNS / 3) begin
-    //     LCD_R <= 5'b11111;
-    //     LCD_G <= 6'b000000;
-    //     LCD_B <= 5'b00000;
-    // end
-    // // Set the second third of the display to green
-    // else if (cur_col < (COLUMNS / 3) * 2) begin
-    //     LCD_R <= 5'b00000;
-    //     LCD_G <= 6'b111111;
-    //     LCD_B <= 5'b00000;
-    // end
-    // // Set the last third of the display to blue
-    // else begin
-    //     LCD_R <= 5'b00000;
-    //     LCD_G <= 6'b000000;
-    //     LCD_B <= 5'b11111;
-    // end
-
+    LCD_R <= (pixel >> 11);
+    LCD_G <= (pixel >> 5) & 6'b1111111;
+    LCD_B <= (pixel) & 5'b11111;
 end
 
 assign LCD_DEN = (cur_row < ROWS) && (cur_col < COLUMNS);
