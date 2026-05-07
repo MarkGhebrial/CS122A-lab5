@@ -36,7 +36,7 @@ initial begin
         #2;
     end
 
-    $finish;            // end simulation, otherwise it runs indefinitely
+    $finish;
 end
 
 endmodule

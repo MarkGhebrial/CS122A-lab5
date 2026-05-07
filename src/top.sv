@@ -14,6 +14,7 @@ module top (
 	output logic [4:0] LCD_B
 );
 
+wire mem_we;
 wire[7:0] mem_waddr;
 wire[15:0] mem_wdata;
 spi_rx s (
