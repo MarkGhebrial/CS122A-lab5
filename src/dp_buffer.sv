@@ -16,18 +16,20 @@ module dp_buffer #(
 );
     logic [WIDTH-1:0] mem [0:DEPTH-1];
 
-    // initial begin
-    //     for (int i = 0; i < DEPTH; i = i + 1) begin
-    //         mem[i] <= 16'h0000;
-    //     end
-    // end
-
-    always_ff @(posedge clk) begin
+    always @(posedge clk) begin
+        // Write to the memory
         if (we) begin
             // mem[7] <= 16'h00FF;
             mem[waddr] <= wdata;
         end
-        rdata <= mem[raddr];  // synchronous read -> EBR
+
+        // Read from the memory
+        if (we && raddr == waddr) begin
+            // Update rdata immediately if we're reading and writing from the same address
+            rdata <= wdata;
+        end else begin
+            rdata <= mem[raddr];  // synchronous read -> EB
+        end
     end
 
 endmodule
