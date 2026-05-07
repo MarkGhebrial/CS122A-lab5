@@ -1,5 +1,6 @@
 `include "src/lcd_controller.sv"
 `include "src/spi.sv"
+`include "dp_buffer.sv"
 
 module top (
     input wire CLK, //FPGA's clock

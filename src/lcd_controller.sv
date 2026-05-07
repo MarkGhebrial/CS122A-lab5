@@ -1,5 +1,3 @@
-`include "src/sprite_buf.sv"
-
 module lcd_controller
 (
     input wire CLK, // FPGA's clock
