@@ -24,49 +24,36 @@ uint16_t mem[16][16] = {
 
 // Set the pins controlled by the FPGA
 void set_peripheral_pins() {
-    // spi_write16_blocking(spi0, (uint16_t*)&mem, 256);
-//     for (int i = 0; i < 16; i++){
-//         for (int j = 0; j < 16; j++){
-//             // // short m = mem[i][j];
-//             // short m = 0xFFFFFFFF;
-//             // // short red = 0xFF00;
-//             // uint8_t upper = ((m) >> 8) % 256;
-//             // uint8_t lower = (m) % 256;
-//             // spi_write_blocking(spi0, &upper, 1);
-//             // spi_write_blocking(spi0, &lower, 1);
-//             spi_write16_blocking(spi0, &mem[i][j], 1);
-//             // uint16_t white = 0x0000;
-//             // spi_write16_blocking(spi0, &white, 1);
-//         }
-//     }
+    for (int i = 0; i < 16; i++){
+        for (int j = 0; j < 16; j++) {
+            spi_write16_blocking(spi0, &mem[i][j], 1);
+        }
+    }
+}
 
-    for (int i = 0; i < 256 * 16; i++) {
-        uint16_t pixel;
-        if (i % 2 == 0) pixel = 0xFFFF;
-        else pixel = 0x00FF;
-        spi_write16_blocking(spi0, &pixel, 1);
+void write_up() {
+    for (int i = 15; i >= 0; i--){
+        for (int j = 15; j >= 0; j--) {
+            spi_write16_blocking(spi0, &mem[i][j], 1);
+        }
     }
 }
 
 int main() {
-    // Set pins 15:12 to be outputs
-    // gpio_init_mask(0xF << 12);
-    // gpio_set_dir_all_bits(0xF << 12);   // 1 is output, 0 is input
-
-    // Initialize SPI 0 with baudrate 4096
-    spi_init(spi0, 4096000);
+    // Initialize SPI 0 with baudrate 409600
+    spi_init(spi0, 409600);
+    spi_set_slave(spi0, false);
     spi_set_format(spi0, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
-    gpio_set_function(2, GPIO_FUNC_SPI); // SCK
-    gpio_set_function(3, GPIO_FUNC_SPI); // TX
+    gpio_set_function(6, GPIO_FUNC_SPI); // SCK
+    gpio_set_function(7, GPIO_FUNC_SPI); // TX
 
 
     busy_wait_ms(200);
-    // while (true) {
-        // Send the 16 pixel bits
+    while (true) {
         set_peripheral_pins();
+        busy_wait_ms(50);
 
-        // busy_wait_ms(50);
-    // }
-
-    while(true) {}
+        write_up();
+        busy_wait_ms(50);
+    }
 }

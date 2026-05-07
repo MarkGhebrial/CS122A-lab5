@@ -1,6 +1,7 @@
 `include "src/lcd_controller.sv"
 `include "src/spi.sv"
-`include "dp_buffer.sv"
+`include "src/dp_buffer.sv"
+`include "src/sprite.sv"
 
 module top (
     input wire CLK, //FPGA's clock
@@ -10,15 +11,15 @@ module top (
 
 	output wire LCD_CLK, // LCD clock. 
 	output wire LCD_DEN,
-	output logic [4:0] LCD_R,
-	output logic [5:0] LCD_G,
-	output logic [4:0] LCD_B
+	output wire [4:0] LCD_R,
+	output wire [5:0] LCD_G,
+	output wire [4:0] LCD_B
 );
 
 wire mem_we;
 wire[7:0] mem_waddr;
 wire[15:0] mem_wdata;
-spi_rx s (
+spi_rx spi (
     .sck(SCK),
     .in(SPI_IN),
     .we(mem_we), // Memory write enable
@@ -28,7 +29,7 @@ spi_rx s (
 
 logic[7:0] mem_raddr;
 wire[15:0] mem_rdata;
-dp_buffer a (
+dp_buffer mem (
     .clk(CLK),
     .we(mem_we),
     .waddr(mem_waddr),
@@ -36,18 +37,23 @@ dp_buffer a (
     .raddr(mem_raddr),
     .rdata(mem_rdata)
 );
+// sprite mem (
+//     .clk(CLK),
+//     .raddr(mem_raddr),
+//     .rdata(mem_rdata)
+// );
 
 lcd_controller controller (
-    .CLK(CLK),
+    .clk(CLK),
 
     .pixel(mem_rdata),
     .pixel_address(mem_raddr),
 
-    .LCD_CLK(LCD_CLK),
-    .LCD_DEN(LCD_DEN),
-    .LCD_R(LCD_R),
-    .LCD_G(LCD_G),
-    .LCD_B(LCD_B)
+    .lcd_clk(LCD_CLK),
+    .lcd_den(LCD_DEN),
+    .lcd_r(LCD_R),
+    .lcd_g(LCD_G),
+    .lcd_b(LCD_B)
 );
 
 endmodule

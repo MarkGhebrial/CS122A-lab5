@@ -1,17 +1,17 @@
 module lcd_controller
 (
-    input wire CLK, // FPGA's clock
+    input wire clk, // FPGA's clock
 
     // The data that's read from memory
-    input [15:0] pixel,
+    input wire [15:0] pixel,
     // The address to read from memory
-    output [7:0] pixel_address, 
+    output logic [7:0] pixel_address, 
 
-	output wire LCD_CLK, // LCD clock. 
-	output wire LCD_DEN,
-	output logic[4:0] LCD_R,
-	output logic[5:0] LCD_G,
-	output logic[4:0] LCD_B
+	output wire lcd_clk, // LCD clock. 
+	output wire lcd_den,
+	output logic[4:0] lcd_r,
+	output logic[5:0] lcd_g,
+	output logic[4:0] lcd_b
 );
 
 // The number of columns of pixels (width of the display)
@@ -29,7 +29,7 @@ logic[8:0] cur_row = 0;
 // Horizontal position. Max value is ROWS + ROW_BUFFER - 1. Min value is 0.
 logic[9:0] cur_col = 0;
 
-always @(posedge CLK) begin
+always @(posedge clk) begin
     // Scan from left to right
     if (cur_col < COLUMNS + COL_BUFFER - 1) begin
         cur_col <= cur_col + 1;
@@ -48,13 +48,13 @@ always @(posedge CLK) begin
     // Sprite row = cur_row % 16
     pixel_address <= (cur_col % 16) + 16*(cur_row %16);
 
-    LCD_R <= (pixel >> 11);
-    LCD_G <= (pixel >> 5) & 6'b1111111;
-    LCD_B <= (pixel) & 5'b11111;
+    lcd_r <= (pixel >> 11);
+    lcd_g <= (pixel >> 5) & 6'b111111;
+    lcd_b <= (pixel) & 5'b11111;
 end
 
-assign LCD_DEN = (cur_row < ROWS) && (cur_col < COLUMNS);
+assign lcd_den = (cur_row < ROWS) && (cur_col < COLUMNS);
 
-assign LCD_CLK = ~CLK;
+assign lcd_clk = ~clk;
 
 endmodule 
