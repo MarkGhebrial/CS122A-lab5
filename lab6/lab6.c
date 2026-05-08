@@ -23,18 +23,15 @@ uint16_t mem[16][16] = {
 };
 
 // Set the pins controlled by the FPGA
-void set_peripheral_pins() {
-    for (int i = 0; i < 16; i++){
-        for (int j = 0; j < 16; j++) {
-            spi_write16_blocking(spi0, &mem[i][j], 1);
-        }
-    }
-}
-
-void write_up() {
-    for (int i = 15; i >= 0; i--){
-        for (int j = 15; j >= 0; j--) {
-            spi_write16_blocking(spi0, &mem[i][j], 1);
+void write_sprite(int rotation) {
+    for (int y = 0; y < 16; y++){
+        for (int x = 0; x < 16; x++) {
+            switch (rotation) {
+                case 0: spi_write16_blocking(spi0, &mem[y][x], 1); break;
+                case 1: spi_write16_blocking(spi0, &mem[15-x][y], 1); break;
+                case 2: spi_write16_blocking(spi0, &mem[15-y][15-x], 1); break;
+                case 3: spi_write16_blocking(spi0, &mem[x][15-y], 1); break;
+            }
         }
     }
 }
@@ -50,10 +47,10 @@ int main() {
 
     busy_wait_ms(200);
     while (true) {
-        set_peripheral_pins();
-        busy_wait_ms(50);
+        for (int i = 0; i < 4; i ++) {
+            write_sprite(i);
+            busy_wait_ms(2000);
 
-        write_up();
-        busy_wait_ms(50);
+        }
     }
 }

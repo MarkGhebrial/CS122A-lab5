@@ -55,6 +55,6 @@ end
 
 assign lcd_den = (cur_row < ROWS) && (cur_col < COLUMNS);
 
-assign lcd_clk = ~clk;
+assign lcd_clk = clk;
 
 endmodule 
